@@ -2342,16 +2342,16 @@ After write
 0x00000ff0: f0 f1 f2 f3 f4 f5 f6 f7 f8 f9 fa fb fc fd fe ff 
 Stress testing w25qxx device: sectors = 4096
 Doing chip erase
-Done erasing - took 45459 ms
+Done erasing - took 45960 ms
 Writing all zeroes 4096 sectors
-Done writing - took 78975 ms
+Done writing - took 78976 ms
 Reading 4096 sectors
 Done reading - took 52137 ms
 Validating buffer .... OK
 Doing chip erase
-Done erasing - took 45334 ms
+Done erasing - took 45811 ms
 Writing 10101010 4096 sectors
-Done writing - took 78976 ms
+Done writing - took 78975 ms
 Reading 4096 sectors
 Done reading - took 52137 ms
 Validating buffer ... OK
@@ -2359,7 +2359,7 @@ Erasing 4096 sectors sequentially
 Done  100 sectors - total time =   3 s
 Done  200 sectors - total time =   7 s
 Done  300 sectors - total time =  11 s
-Done  400 sectors - total time =  14 s
+Done  400 sectors - total time =  15 s
 Done  500 sectors - total time =  18 s
 Done  600 sectors - total time =  22 s
 Done  700 sectors - total time =  25 s
@@ -2369,48 +2369,48 @@ Done 1000 sectors - total time =  36 s
 Done 1100 sectors - total time =  40 s
 Done 1200 sectors - total time =  43 s
 Done 1300 sectors - total time =  47 s
-Done 1400 sectors - total time =  50 s
+Done 1400 sectors - total time =  51 s
 Done 1500 sectors - total time =  54 s
-Done 1600 sectors - total time =  57 s
+Done 1600 sectors - total time =  58 s
 Done 1700 sectors - total time =  61 s
 Done 1800 sectors - total time =  65 s
-Done 1900 sectors - total time =  68 s
+Done 1900 sectors - total time =  69 s
 Done 2000 sectors - total time =  72 s
 Done 2100 sectors - total time =  76 s
-Done 2200 sectors - total time =  79 s
+Done 2200 sectors - total time =  80 s
 Done 2300 sectors - total time =  83 s
-Done 2400 sectors - total time =  86 s
-Done 2500 sectors - total time =  90 s
-Done 2600 sectors - total time =  93 s
+Done 2400 sectors - total time =  87 s
+Done 2500 sectors - total time =  91 s
+Done 2600 sectors - total time =  94 s
 Done 2700 sectors - total time =  97 s
-Done 2800 sectors - total time = 100 s
-Done 2900 sectors - total time = 104 s
-Done 3000 sectors - total time = 107 s
+Done 2800 sectors - total time = 101 s
+Done 2900 sectors - total time = 105 s
+Done 3000 sectors - total time = 108 s
 Done 3100 sectors - total time = 111 s
-Done 3200 sectors - total time = 114 s
-Done 3300 sectors - total time = 118 s
-Done 3400 sectors - total time = 121 s
-Done 3500 sectors - total time = 125 s
-Done 3600 sectors - total time = 128 s
-Done 3700 sectors - total time = 132 s
-Done 3800 sectors - total time = 135 s
-Done 3900 sectors - total time = 139 s
-Done 4000 sectors - total time = 142 s
-Done erasing - took 146093 ms
+Done 3200 sectors - total time = 115 s
+Done 3300 sectors - total time = 119 s
+Done 3400 sectors - total time = 122 s
+Done 3500 sectors - total time = 126 s
+Done 3600 sectors - total time = 129 s
+Done 3700 sectors - total time = 133 s
+Done 3800 sectors - total time = 136 s
+Done 3900 sectors - total time = 140 s
+Done 4000 sectors - total time = 143 s
+Done erasing - took 147198 ms
 ---------------
 Reading page at address     : 0x00000000
 Reading old value           : 0xaf19d570
 After erase                 : 0xaf19d570
 Writing page value          : 0xe268a03f
 Reading back                : 0xe268a03f
-Test time                   : 149 ms
+Test time                   : 152 ms
 ---------------
 Reading page at address     : 0x00000400
 Reading old value           : 0xb8b246a5
 After erase                 : 0xaf19d570
 Writing page value          : 0xe268a03f
 Reading back                : 0xe268a03f
-Test time                   : 141 ms
+Test time                   : 150 ms
 ---------------
 Reading page at address     : 0x00000800
 Reading old value           : 0xb8b246a5
@@ -2424,25 +2424,4 @@ Reading old value           : 0xb8b246a5
 After erase                 : 0xaf19d570
 Writing page value          : 0xe268a03f
 Reading back                : 0xe268a03f
-Test time                   : 145 ms
----------------
-Reading page at address     : 0x00001000
-Reading old value           : 0xb8b246a5
-After erase                 : 0xaf19d570
-Writing page value          : 0xe268a03f
-Reading back                : 0xe268a03f
-Test time                   : 102 ms
----------------
-Reading page at address     : 0x00001400
-Reading old value           : 0xb8b246a5
-After erase                 : 0xaf19d570
-Writing page value          : 0xe268a03f
-Reading back                : 0xe268a03f
 Test time                   : 149 ms
----------------
-Reading page at address     : 0x00001800
-Reading old value           : 0xb8b246a5
-After erase                 : 0xaf19d570
-Writing page value          : 0xe268a03f
-Reading back                : 0xe268a03f
-Test time                   : 147 ms

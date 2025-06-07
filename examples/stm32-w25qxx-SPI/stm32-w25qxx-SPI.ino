@@ -137,25 +137,25 @@ void setup()
     DBG("Stress testing w25qxx device: sectors = %lu\n", sectors);
 
     DBG("Doing chip erase\n");
-    start = HAL_GetTick();
+    start = millis();
     w25qxx_chip_erase(&w25qxx);
-    DBG("Done erasing - took %lu ms\n", HAL_GetTick() - start);
+    DBG("Done erasing - took %lu ms\n", millis() - start);
 
     fill_buffer(0, buf, sizeof(buf));
 
     DBG("Writing all zeroes %lu sectors\n", sectors);
-    start = HAL_GetTick();
+    start = millis();
     for (uint32_t i = 0; i < sectors; ++i) {
         w25qxx_write(&w25qxx, i * w25qxx.sector_size, buf, sizeof(buf));
     }
-    DBG("Done writing - took %lu ms\n", HAL_GetTick() - start);
+    DBG("Done writing - took %lu ms\n", millis() - start);
 
     DBG("Reading %lu sectors\n", sectors);
-    start = HAL_GetTick();
+    start = millis();
     for (uint32_t i = 0; i < sectors; ++i) {
         w25qxx_read(&w25qxx, i * w25qxx.sector_size, buf, sizeof(buf));
     }
-    DBG("Done reading - took %lu ms\n", HAL_GetTick() - start);
+    DBG("Done reading - took %lu ms\n", millis() - start);
 
     DBG("Validating buffer .... ");
     if (check_buffer(0, buf, sizeof(buf))) {
@@ -165,25 +165,25 @@ void setup()
     }
 
     DBG("Doing chip erase\n");
-    start = HAL_GetTick();
+    start = millis();
     w25qxx_chip_erase(&w25qxx);
-    DBG("Done erasing - took %lu ms\n", HAL_GetTick() - start);
+    DBG("Done erasing - took %lu ms\n", millis() - start);
 
     fill_buffer(1, buf, sizeof(buf));
 
     DBG("Writing 10101010 %lu sectors\n", sectors);
-    start = HAL_GetTick();
+    start = millis();
     for (uint32_t i = 0; i < sectors; ++i) {
         w25qxx_write(&w25qxx, i * w25qxx.sector_size, buf, sizeof(buf));
     }
-    DBG("Done writing - took %lu ms\n", HAL_GetTick() - start);
+    DBG("Done writing - took %lu ms\n", millis() - start);
 
     DBG("Reading %lu sectors\n", sectors);
-    start = HAL_GetTick();
+    start = millis();
     for (uint32_t i = 0; i < sectors; ++i) {
         w25qxx_read(&w25qxx, i * w25qxx.sector_size, buf, sizeof(buf));
     }
-    DBG("Done reading - took %lu ms\n", HAL_GetTick() - start);
+    DBG("Done reading - took %lu ms\n", millis() - start);
 
     DBG("Validating buffer ... ");
     if (check_buffer(1, buf, sizeof(buf))) {
@@ -193,20 +193,20 @@ void setup()
     }
 
     DBG("Erasing %lu sectors sequentially\n", sectors);
-    start = HAL_GetTick();
+    start = millis();
     for (uint32_t i = 0; i < sectors; ++i) {
         w25qxx_erase(&w25qxx, i * w25qxx.sector_size, sizeof(buf));
         if ((i > 0) && (i % 100 == 0)) {
-            DBG("Done %4lu sectors - total time = %3lu s\n", i, (HAL_GetTick() - start) / 1000);
+            DBG("Done %4lu sectors - total time = %3lu s\n", i, (millis() - start) / 1000);
         }
     }
-    DBG("Done erasing - took %lu ms\n", HAL_GetTick() - start);
+    DBG("Done erasing - took %lu ms\n", millis() - start);
 
     uint32_t now = 0, last_blink = 0, last_test = 0, offset_address = 0;
 
     while (1) {
 
-        now = HAL_GetTick();
+        now = millis();
 
         if (now - last_blink >= 500) {
 
@@ -247,7 +247,7 @@ void setup()
                 }
             }
 
-            DBG("Test time                   : %lu ms\n", HAL_GetTick() - now);
+            DBG("Test time                   : %lu ms\n", millis() - now);
 
             offset_address += PAGE_SIZE / 4;
 
