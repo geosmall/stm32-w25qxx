@@ -18,7 +18,6 @@
  ******************************************************************************
  */
 
-#include "main.h"
 #include "w25qxx.h"
 #include <string.h>
 
@@ -37,10 +36,9 @@
  * @param  W25Qxx handle
  * @retval None
  */
-static inline void cs_on(W25QXX_HandleTypeDef *w25qxx) {
-#ifndef W25QXX_QSPI
-    HAL_GPIO_WritePin(w25qxx->cs_port, w25qxx->cs_pin, GPIO_PIN_RESET);
-#endif
+static inline void cs_on(W25QXX_HandleTypeDef *w25qxx)
+{
+    w25qxx->bus->set_cs(w25qxx->bus->user_ctx, 0);
 }
 
 /**
@@ -49,8 +47,9 @@ static inline void cs_on(W25QXX_HandleTypeDef *w25qxx) {
  * @param  W25Qxx handle
  * @retval None
  */
-static inline void cs_off(W25QXX_HandleTypeDef *w25qxx) {
-    HAL_GPIO_WritePin(w25qxx->cs_port, w25qxx->cs_pin, GPIO_PIN_SET);
+static inline void cs_off(W25QXX_HandleTypeDef *w25qxx)
+{
+    w25qxx->bus->set_cs(w25qxx->bus->user_ctx, 1);
 }
 
 /**
@@ -63,7 +62,7 @@ static inline void cs_off(W25QXX_HandleTypeDef *w25qxx) {
  */
 W25QXX_result_t w25qxx_transmit(W25QXX_HandleTypeDef *w25qxx, uint8_t *buf, uint32_t len) {
     W25QXX_result_t ret = W25QXX_Err;
-    if (HAL_SPI_Transmit(w25qxx->spiHandle, buf, len, HAL_MAX_DELAY) == HAL_OK) {
+    if (w25qxx->bus->spi_tx(w25qxx->bus->user_ctx, buf, len) == 0) {
         ret = W25QXX_Ok;
     }
     return ret;
@@ -74,7 +73,7 @@ W25QXX_result_t w25qxx_transmit(W25QXX_HandleTypeDef *w25qxx, uint8_t *buf, uint
  */
 W25QXX_result_t w25qxx_receive(W25QXX_HandleTypeDef *w25qxx, uint8_t *buf, uint32_t len) {
     W25QXX_result_t ret = W25QXX_Err;
-    if (HAL_SPI_Receive(w25qxx->spiHandle, buf, len, HAL_MAX_DELAY) == HAL_OK) {
+    if (w25qxx->bus->spi_rx(w25qxx->bus->user_ctx, buf, len) == 0) {
         ret = W25QXX_Ok;
     }
     return ret;
@@ -122,42 +121,25 @@ W25QXX_result_t w25qxx_write_enable(W25QXX_HandleTypeDef *w25qxx) {
 
 W25QXX_result_t w25qxx_wait_for_ready(W25QXX_HandleTypeDef *w25qxx, uint32_t timeout) {
     W25QXX_result_t ret = W25QXX_Ok;
-    uint32_t begin = HAL_GetTick();
-    uint32_t now = HAL_GetTick();
-    // Wait until the busy flags disappear.
+    uint32_t begin = w25qxx->bus->ticks_ms();
+    uint32_t now = w25qxx->bus->ticks_ms();
     while ((now - begin <= timeout) && (w25qxx_get_status(w25qxx) & 0x01)) {
-        now = HAL_GetTick();
+        now = w25qxx->bus->ticks_ms();
     }
     if (now - begin == timeout)
         ret = W25QXX_Timeout;
     return ret;
 }
 
-#ifdef W25QXX_QSPI
-W25QXX_result_t w25qxx_init(W25QXX_HandleTypeDef *w25qxx, QSPI_HandleTypeDef *qhspi) {
-#else
-W25QXX_result_t w25qxx_init(W25QXX_HandleTypeDef *w25qxx, SPI_HandleTypeDef *hspi, GPIO_TypeDef *cs_port, uint16_t cs_pin) {
-#endif
+W25QXX_result_t w25qxx_init(W25QXX_HandleTypeDef *w25qxx) {
 
     W25QXX_result_t result = W25QXX_Ok;
 
     W25_DBG("w25qxx_init");
 
-    char *version_buffer = malloc(strlen(W25QXX_VERSION) + 1);
-    if (version_buffer) {
-        sprintf(version_buffer, "%s", W25QXX_VERSION);
-        free(version_buffer);
-    }
-
-#ifdef W25QXX_QSPI
-    w25qxx->qspiHandle = qhspi;
-#else
-    w25qxx->spiHandle = hspi;
-    w25qxx->cs_port = cs_port;
-    w25qxx->cs_pin = cs_pin;
-
     cs_off(w25qxx);
-#endif
+
+    w25qxx->bus->delay_ms(10);
 
     uint32_t id = w25qxx_read_id(w25qxx);
     if (id) {
@@ -194,9 +176,6 @@ W25QXX_result_t w25qxx_init(W25QXX_HandleTypeDef *w25qxx, SPI_HandleTypeDef *hsp
             switch (w25qxx->device_id) {
             case 0x4018:
                 w25qxx->block_count = 0x100;
-                break;
-            case 0x4017:
-                w25qxx->block_count = 0x80;
                 break;
             case 0x4016:
                 w25qxx->block_count = 0x40;
@@ -237,7 +216,7 @@ W25QXX_result_t w25qxx_read(W25QXX_HandleTypeDef *w25qxx, uint32_t address, uint
     };
 
     // First wait for device to get ready
-    if (w25qxx_wait_for_ready(w25qxx, HAL_MAX_DELAY) != W25QXX_Ok) {
+    if (w25qxx_wait_for_ready(w25qxx, w25qxx->bus->max_delay_ms) != W25QXX_Ok) {
         return W25QXX_Err;
     }
 
@@ -274,7 +253,7 @@ W25QXX_result_t w25qxx_write(W25QXX_HandleTypeDef *w25qxx, uint32_t address, uin
         W25_DBG("w25qxx_write: handling page %lu start_address = 0x%08lx buffer_offset = 0x%08lx len = %04lx", page, start_address, buffer_offset, write_len);
 
         // First wait for device to get ready
-        if (w25qxx_wait_for_ready(w25qxx, HAL_MAX_DELAY) != W25QXX_Ok) {
+        if (w25qxx_wait_for_ready(w25qxx, w25qxx->bus->max_delay_ms) != W25QXX_Ok) {
             return W25QXX_Err;
         }
 
@@ -318,7 +297,7 @@ W25QXX_result_t w25qxx_erase(W25QXX_HandleTypeDef *w25qxx, uint32_t address, uin
         W25_DBG("Erasing sector %lu, starting at: 0x%08lx", sector, sector * w25qxx->sector_size);
 
         // First we have to ensure the device is not busy
-        if (w25qxx_wait_for_ready(w25qxx, HAL_MAX_DELAY) == W25QXX_Ok) {
+        if (w25qxx_wait_for_ready(w25qxx, w25qxx->bus->max_delay_ms) == W25QXX_Ok) {
             if (w25qxx_write_enable(w25qxx) == W25QXX_Ok) {
 
                 uint32_t sector_start_address = sector * w25qxx->sector_size;
@@ -350,7 +329,7 @@ W25QXX_result_t w25qxx_chip_erase(W25QXX_HandleTypeDef *w25qxx) {
             return W25QXX_Err;
         }
         cs_off(w25qxx);
-        if (w25qxx_wait_for_ready(w25qxx, HAL_MAX_DELAY) != W25QXX_Ok) {
+        if (w25qxx_wait_for_ready(w25qxx, w25qxx->bus->max_delay_ms) != W25QXX_Ok) {
             return W25QXX_Err;
         }
     }

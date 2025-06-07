@@ -1,0 +1,13 @@
+{
+  "name": "stm32-w25qxx",
+  "version": "1.0.0",
+  "keywords": "flash, spi",
+  "description": "Library for read/write access to SPI flash memory chips",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/geosmall/stm32-w25qxx"
+  },
+  "frameworks": "arduino",
+  "platforms": "stm32"
+}
